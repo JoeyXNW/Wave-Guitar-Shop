@@ -1,0 +1,22 @@
+import React, { Component } from "react";
+
+class Header extends Component {
+  state = {};
+  render() {
+    return (
+      <header className="bck_b_light">
+        <div className="container">
+          <div className="left">
+            <div className="logo">WAVES</div>
+          </div>
+          <div className="right">
+            <div className="top">aLinks</div>
+            <div className="bottom">bLinks</div>
+          </div>
+        </div>
+      </header>
+    );
+  }
+}
+
+export default Header;
