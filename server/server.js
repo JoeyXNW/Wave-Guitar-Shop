@@ -1,6 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const formidable = require("express-formidable");
+const cloudinary = require("cloudinary");
 
 const app = express();
 const mongoose = require("mongoose");
@@ -18,6 +20,13 @@ app.listen(port, () => {
   console.log(`Server Running at ${port}`);
 });
 
+// Set up cloudinary account
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET
+});
+
 // Models
 const { User } = require("./models/user");
 const { Brand } = require("./models/brand");
@@ -30,14 +39,50 @@ const { admin } = require("./middleware/admin");
 //===========================================
 //              Guitar
 //===========================================
+
+// get produts on the shop page
+app.post("/api/product/shop", (req, res) => {
+  let order = req.body.order ? req.body.order : "asc";
+  let sortBy = req.body.sortBy ? req.body.sortBy : "_id";
+  let limit = req.body.limit ? parseInt(req.body.limit) : 100;
+  let skip = parseInt(req.body.skip);
+  let findArgs = {};
+
+  for (let key in req.body.filters) {
+    if (req.body.filters[key].length === 0) continue;
+
+    if (key === "price") {
+      findArgs[key] = {
+        $gte: req.body.filters[key][0],
+        $lte: req.body.filters[key][1]
+      };
+    } else {
+      findArgs[key] = req.body.filters[key];
+    }
+  }
+  findArgs["publish"] = true;
+
+  Guitar.find(findArgs)
+    .populate("brand")
+    .populate("wood")
+    .sort([[sortBy, order]])
+    .skip(skip)
+    .limit(limit)
+    .exec((err, guitars) => {
+      if (err) return res.status(400).send(err);
+
+      res.status(200).json({ size: guitars.length, guitars, findArgs });
+    });
+});
+
 // Guitar register
 app.post("/api/product/guitar", auth, admin, (req, res) => {
   const guitar = new Guitar(req.body);
   guitar.save((err, doc) => {
     if (err) return res.json({ success: false, err });
     res.status(200).json({
-      success: true,
-      guitar: doc
+      success: true
+      // guitar: doc
     });
   });
 });
@@ -56,7 +101,8 @@ app.get("/api/product/guitars", (req, res) => {
     .limit(limit)
     .exec((err, guitars) => {
       if (err) return res.status(400).send(err);
-      return res.send(guitars);
+
+      res.status(200).send(guitars);
     });
 });
 
@@ -83,8 +129,8 @@ app.post("/api/product/wood", auth, admin, (req, res) => {
   wood.save((err, doc) => {
     if (err) return res.json({ success: false, err });
     res.status(200).json({
-      success: true,
-      wood: doc
+      success: true
+      // wood: doc
     });
   });
 });
@@ -140,7 +186,7 @@ app.post("/api/users/register", (req, res) => {
   user.save((err, doc) => {
     if (err) return res.json({ success: false, err });
     res.status(200).json({
-      success: true
+      registerSuccess: true
       // userdata: doc
     });
   });
@@ -173,7 +219,31 @@ app.post("/api/users/login", (req, res) => {
 //User Logout
 app.get("/api/users/logout", auth, (req, res) => {
   User.findOneAndUpdate({ _id: req.user._id }, { token: "" }, (err, doc) => {
-    if (err) return res.json({ success: false, err });
-    return res.status(200).send({ success: true });
+    if (err) return res.json({ logoutSuccess: false, err });
+    return res.status(200).send({ logoutSuccess: true });
+  });
+});
+
+// upload image
+app.post("/api/users/uploadimage", auth, admin, formidable(), (req, res) => {
+  cloudinary.uploader.upload(
+    req.files.file.path,
+    result => {
+      res.status(200).send({ public_id: result.public_id, url: result.url });
+    },
+    {
+      public_id: `${Date.now()}`,
+      resource_type: "auto"
+    }
+  );
+});
+
+app.get("/api/users/removeimage", auth, admin, (req, res) => {
+  let id = req.query.public_id;
+
+  cloudinary.uploader.destroy(id, (error, result) => {
+    if (error) return res.json({ success: false });
+
+    res.status(200).send("image removed successfully");
   });
 });

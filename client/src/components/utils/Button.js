@@ -1,20 +1,47 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faShoppingBag } from "@fortawesome/free-solid-svg-icons";
 
-const Button = props => {
+const Button = ({
+  type = "default",
+  linkTo,
+  addStyles,
+  title,
+  altClass,
+  runAction
+}) => {
   const buttons = () => {
     let template = "";
-    switch (props.type) {
+
+    switch (type) {
       case "default":
         template = (
-          <Link className="link_default" to={props.linkTo} {...props.addStyles}>
-            Button
+          <Link
+            className={!altClass ? "link_default" : altClass}
+            to={linkTo}
+            {...addStyles}
+          >
+            {title}
           </Link>
+        );
+        break;
+      case "bag_link":
+        template = (
+          <div
+            className="bag_link"
+            onClick={() => {
+              runAction();
+            }}
+          >
+            <FontAwesomeIcon icon={faShoppingBag} />
+          </div>
         );
         break;
       default:
         template = "";
     }
+
     return template;
   };
   return <div className="my_link">{buttons()}</div>;

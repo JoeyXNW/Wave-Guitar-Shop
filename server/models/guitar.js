@@ -44,7 +44,7 @@ const guitarSchema = mongoose.Schema(
     },
     sold: {
       type: Number,
-      required: true,
+      required: false,
       maxlength: 255
     },
     publish: {

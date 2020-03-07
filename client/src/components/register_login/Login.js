@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import FormField from "../utils/form/FormField";
 import { update, generateData, isFormValid } from "../utils/form/FormActions";
 import { loginUser } from "../../actions/user_actions";
-import { withRouter } from "react-router-dom";
+import { withRouter } from "react-router-dom"; // inject props from its parent
 
 class Login extends Component {
   state = {
@@ -55,11 +55,10 @@ class Login extends Component {
     if (!formIsValid) {
       return this.setState({ formError: true });
     }
-    console.log(dataToSubmit);
-    // this.props.dispatch(loginUser(dataToSubmit));
+
     this.props.dispatch(loginUser(dataToSubmit)).then(response => {
       if (response.payload.loginSuccess) {
-        console.log(response.payload);
+        // login is a child of RegisterLogin, while RegisterLogin is a child of Routes
         this.props.history.push("/user/dashboard");
       } else {
         this.setState({
@@ -98,5 +97,4 @@ class Login extends Component {
   }
 }
 
-// export default Login;
 export default connect()(withRouter(Login));

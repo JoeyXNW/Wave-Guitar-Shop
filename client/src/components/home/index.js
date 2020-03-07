@@ -1,15 +1,32 @@
 import React, { Component } from "react";
-import Layout from "../../hoc/Layout";
+import HomePromotion from "./HomePromotion";
+import HomeSlider from "./HomeSlider";
+import { connect } from "react-redux";
+import {
+  getProductByArrival,
+  getProductBySell
+} from "../../actions/product_actions";
+import CardBlock from "../utils/card/CardBlock";
 
 class Home extends Component {
-  state = {};
+  componentDidMount() {
+    this.props.dispatch(getProductByArrival());
+    this.props.dispatch(getProductBySell());
+  }
+
   render() {
     return (
-      <Layout>
-        <p>Hello home</p>
-      </Layout>
+      <div>
+        <HomeSlider />
+        <CardBlock list={this.props.products.bySell} title="best selling" />
+        <HomePromotion />
+        <CardBlock list={this.props.products.byArrival} title="new arrival" />
+      </div>
     );
   }
 }
+const mapStateToProps = state => {
+  return { products: state.products };
+};
 
-export default Home;
+export default connect(mapStateToProps)(Home);
