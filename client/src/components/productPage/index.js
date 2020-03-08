@@ -1,6 +1,7 @@
 import { CircularProgress } from "@material-ui/core";
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { addToCart } from "../../actions/user_actions";
 
 import {
   clearProductDetail,
@@ -28,10 +29,11 @@ class ProductPage extends Component {
     this.props.dispatch(clearProductDetail());
   }
 
-  addToCart = id => {};
+  addToCart = id => {
+    this.props.dispatch(addToCart(id));
+  };
 
   render() {
-    console.log(this.props);
     return (
       <>
         <PageTop title="product detail" />

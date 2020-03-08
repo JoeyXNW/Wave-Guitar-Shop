@@ -50,16 +50,21 @@ class Header extends Component {
     });
   };
 
-  cartLink = (item, i) => {
+  displayCartQuantity = () => {
     const user = this.props.user.userData;
-
-    return (
-      <div className="cart_link" key={i}>
-        <span>{user.cart ? user.cart.length : 0}</span>
-        <Link to={item.linkTo}>{item.name}</Link>
-      </div>
-    );
+    let sum = 0;
+    user.cart.forEach(item => {
+      return (sum += item.quantity);
+    });
+    return sum;
   };
+
+  cartLink = (item, i) => (
+    <div className="cart_link" key={i}>
+      <span>{this.displayCartQuantity()}</span>
+      <Link to={item.linkTo}>{item.name}</Link>
+    </div>
+  );
 
   defaultLink = (item, i) =>
     item.name === "Log out" ? (

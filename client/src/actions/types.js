@@ -12,3 +12,4 @@ export const ADD_WOOD = "add_wood";
 export const ADD_PRODUCT = "add_product";
 export const GET_GUITAR_BY_ID = "get_guitar_by_id";
 export const CLEAR_PRODUCT_DETAIL = "clear_product_detail";
+export const ADD_TO_CART = "add_to_cart";

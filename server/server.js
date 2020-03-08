@@ -88,7 +88,7 @@ app.post("/api/product/guitar", auth, admin, (req, res) => {
 });
 
 // Get guitar by arrival
-// sortedBy=createdAt&Order=desc&limit=4&skip=5
+// sortBy=createdAt&order=desc&limit=4&skip=5
 app.get("/api/product/guitars", (req, res) => {
   let order = req.query.order ? req.query.order : "asc";
   let sortBy = req.query.sortBy ? req.query.sortBy : "_id";
@@ -129,8 +129,8 @@ app.post("/api/product/wood", auth, admin, (req, res) => {
   wood.save((err, doc) => {
     if (err) return res.json({ success: false, err });
     res.status(200).json({
-      success: true
-      // wood: doc
+      success: true,
+      wood: doc
     });
   });
 });
@@ -151,7 +151,8 @@ app.post("/api/product/brand", auth, admin, (req, res) => {
   brand.save((err, doc) => {
     if (err) return res.json({ success: false, err });
     res.status(200).json({
-      success: true
+      success: true,
+      brand: doc
     });
   });
 });
@@ -224,6 +225,7 @@ app.get("/api/users/logout", auth, (req, res) => {
   });
 });
 
+//
 // upload image
 app.post("/api/users/uploadimage", auth, admin, formidable(), (req, res) => {
   cloudinary.uploader.upload(
@@ -238,6 +240,50 @@ app.post("/api/users/uploadimage", auth, admin, formidable(), (req, res) => {
   );
 });
 
+//add cart
+app.post("/api/users/addtocart", auth, (req, res) => {
+  User.findOne({ _id: req.user._id }, (err, doc) => {
+    for (let item of doc.cart) {
+      if (item.id == req.query.productId) {
+        return User.findOneAndUpdate(
+          {
+            _id: req.user._id,
+            "cart.id": mongoose.Types.ObjectId(req.query.productId)
+          },
+          { $inc: { "cart.$.quantity": 1 } },
+          { new: true },
+          () => {
+            if (err) return res.json({ success: false, err });
+            res.status(200).json(doc.cart);
+          }
+        );
+      }
+    }
+
+    User.findOneAndUpdate(
+      { _id: req.user._id },
+      {
+        $push: {
+          cart: {
+            id: mongoose.Types.ObjectId(req.query.productId),
+            quantity: 1,
+            date: Date.now()
+          }
+        }
+      },
+      { new: true },
+      (err, doc) => {
+        if (err) return res.json({ success: false, err });
+        res.status(200).json(doc.cart);
+      }
+    );
+  });
+});
+
+//===========================================
+//             Cloudindary
+//===========================================
+// remove image from cloudinary
 app.get("/api/users/removeimage", auth, admin, (req, res) => {
   let id = req.query.public_id;
 
