@@ -1,19 +1,20 @@
 import React, { Component } from "react";
-import UserLayout from "../../../hoc/UserLayout";
-import FormField from "../../utils/form/FormField";
+import { connect } from "react-redux";
+
 import {
-  update,
+  addProduct,
+  getBrands,
+  getWoods
+} from "../../../actions/product_actions";
+import UserLayout from "../../../hoc/UserLayout";
+import FileUpload from "../../utils/form/FileUpload";
+import {
   generateData,
   isFormValid,
-  populateOptionFields
+  populateOptionFields,
+  update
 } from "../../utils/form/FormActions";
-import { connect } from "react-redux";
-import {
-  getBrands,
-  getWoods,
-  addProduct
-} from "../../../actions/product_actions";
-import FileUpload from "../../utils/form/FileUpload";
+import FormField from "../../utils/form/FormField";
 
 const initialState = {
   formError: false,
@@ -212,6 +213,7 @@ class AddProducts extends Component {
     event.preventDefault();
 
     let dataToSubmit = generateData(this.state.formData, "products");
+    dataToSubmit["sold"] = 0;
     let formIsValid = isFormValid(this.state.formData, "products");
 
     if (!formIsValid) {

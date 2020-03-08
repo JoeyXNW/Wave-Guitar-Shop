@@ -630,6 +630,7 @@ footer .business_nfo .nfo {
   text-transform: uppercase;
   color: #999592;
   padding-left: 20px;
+  vertical-align: middle;
 }
 
 .product_detail_wrapper .product_actions .price {
@@ -668,6 +669,10 @@ footer .business_nfo .nfo {
   font-size: 15px;
   text-transform: uppercase;
   color: #838383;
+}
+
+.product_detail_wrapper .product_specifications h2 {
+  text-transform: uppercase;
 }
 
 .product_detail_wrapper .product_image_container {
