@@ -38,6 +38,8 @@ const { Payment } = require("./models/payment");
 //Middleware
 const { auth } = require("./middleware/auth");
 const { admin } = require("./middleware/admin");
+
+mongoose.set("useFindAndModify", false);
 //===========================================
 //              Guitar
 //===========================================
@@ -246,43 +248,49 @@ app.post("/api/users/uploadimage", auth, admin, formidable(), (req, res) => {
 //add cart
 app.post("/api/users/addtocart", auth, (req, res) => {
   User.findOne({ _id: req.user._id }, (err, doc) => {
+    let duplicate = false;
+
+    // doc.cart.forEach(item => {
     for (let item of doc.cart) {
       if (item.id == req.query.productId) {
-        return User.update(
-          {
-            _id: req.user._id,
-            "cart.id": mongoose.Types.ObjectId(req.query.productId)
-          },
-          // { $inc: { "cart.$.quantity": 1, cartTotal: 1 } },
-          { $inc: { "cart.$.quantity": 1, cartTotal: 1 } },
-          { new: true },
-          () => {
-            if (err) return res.json({ success: false, err });
-            res.status(200).json(doc.cart);
-          }
-        );
+        duplicate = true;
+        break;
       }
     }
-
-    // User.findOneAndUpdate(
-    User.update(
-      { _id: req.user._id },
-      {
-        $push: {
-          cart: {
-            id: mongoose.Types.ObjectId(req.query.productId),
-            quantity: 1,
-            date: Date.now()
-          }
+    console.log(duplicate);
+    if (duplicate) {
+      User.findOneAndUpdate(
+        {
+          _id: req.user._id,
+          "cart.id": mongoose.Types.ObjectId(req.query.productId)
         },
-        $inc: { cartTotal: 1 }
-      },
-      { new: true },
-      (err, doc) => {
-        if (err) return res.json({ success: false, err });
-        res.status(200).json(doc.cart);
-      }
-    );
+        { $inc: { "cart.$.quantity": 1, cartTotal: 1 } },
+        { new: true },
+        (err, file) => {
+          if (err) return res.json({ success: false, err });
+          res.status(200).send({ cart: file.cart, cartTotal: file.cartTotal });
+        }
+      );
+    } else {
+      User.findOneAndUpdate(
+        { _id: req.user._id },
+        {
+          $push: {
+            cart: {
+              id: mongoose.Types.ObjectId(req.query.productId),
+              quantity: 1,
+              date: Date.now()
+            }
+          },
+          $inc: { cartTotal: 1 }
+        },
+        { new: true },
+        (err, doc) => {
+          if (err) return res.json({ success: false, err });
+          res.status(200).send({ cart: doc.cart, cartTotal: doc.cartTotal });
+        }
+      );
+    }
   });
 });
 
@@ -290,11 +298,14 @@ app.post("/api/users/addtocart", auth, (req, res) => {
 app.get("/api/users/removefromcart", auth, (req, res) => {
   User.findOneAndUpdate(
     { _id: req.user._id },
-    { $pull: { cart: { id: mongoose.Types.ObjectId(req.query._id) } } },
+    {
+      $pull: { cart: { id: mongoose.Types.ObjectId(req.query._id) } },
+      $inc: { cartTotal: -req.query.qty }
+    },
     { new: true },
     (err, doc) => {
-      console.log(doc);
       let cart = doc.cart;
+      let cartTotal = doc.cartTotal;
       let array = cart.map(item => {
         return mongoose.Types.ObjectId(item.id);
       });
@@ -305,7 +316,8 @@ app.get("/api/users/removefromcart", auth, (req, res) => {
         .exec((err, cartDetail) => {
           return res.status(200).json({
             cartDetail,
-            cart
+            cart,
+            cartTotal
           });
         });
     }

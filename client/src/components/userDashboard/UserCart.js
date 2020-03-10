@@ -2,6 +2,7 @@ import { faFrown, faSmile } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { CircularProgress } from "@material-ui/core";
 
 import {
   getCartItem,
@@ -25,11 +26,13 @@ class UserCart extends Component {
     let cartItem = [];
     let user = this.props.user.userData;
 
-    if (!user.cart || !user.cart.length) return;
+    if (!user.cart || !user.cart.length)
+      return this.setState({ loading: false });
 
     user.cart.forEach(item => cartItem.push(item.id));
     this.props.dispatch(getCartItem(cartItem, user.cart)).then(() => {
       this.calculateTotal();
+      this.setState({ loading: false });
     });
   }
 
@@ -57,12 +60,12 @@ class UserCart extends Component {
     </div>
   );
 
-  removeFromCart = id => {
-    const { cartDetail } = this.props.user;
-    this.props.dispatch(removeCartItem(id)).then(() => {
-      if (cartDetail.length <= 0) return this.setState({ showTotal: false });
+  removeFromCart = (id, quantity) => {
+    this.props.dispatch(removeCartItem(id, quantity)).then(() => {
+      const { cartTotal } = this.props.user.userData;
+      if (!cartTotal) return this.setState({ showTotal: false });
 
-      this.calculateTotal(cartDetail);
+      this.calculateTotal();
     });
   };
 
@@ -86,30 +89,34 @@ class UserCart extends Component {
   };
 
   render() {
-    const { showTotal, total, showSuccess } = this.state;
+    const { showTotal, total, showSuccess, loading } = this.state;
     return (
       <UserLayout>
         <h1>My Cart</h1>
-        <div className="user_cart">
-          <ProductBlock
-            products={this.props.user.cartDetail}
-            type="cart"
-            removeItem={id => this.removeFromCart(id)}
-          />
-          {showTotal && (
-            <div className="user_cart_sum">Total amount: $ {total}</div>
-          )}
-          {!showTotal && !showSuccess && this.showNoItemMessage()}
-          {!showTotal && showSuccess && this.showSuccessMessage()}
-        </div>
-        {showTotal && (
-          <div className="paypal_button_container">
-            <Paypal
-              toPay={total}
-              transactionError={data => this.transactionError(data)}
-              transactionCancelled={data => this.transactionCancelled(data)}
-              onSuccess={data => this.transactionSuccess(data)}
+        {loading ? (
+          <CircularProgress style={{ color: "#00bcd4" }} thickness={7} />
+        ) : (
+          <div className="user_cart">
+            <ProductBlock
+              products={this.props.user.cartDetail}
+              type="cart"
+              removeItem={(id, quantity) => this.removeFromCart(id, quantity)}
             />
+            {showTotal && (
+              <div className="user_cart_sum">Total amount: $ {total}</div>
+            )}
+            {!showTotal && !showSuccess && this.showNoItemMessage()}
+            {!showTotal && showSuccess && this.showSuccessMessage()}
+            {showTotal && (
+              <div className="paypal_button_container">
+                <Paypal
+                  toPay={total}
+                  transactionError={data => this.transactionError(data)}
+                  transactionCancelled={data => this.transactionCancelled(data)}
+                  onSuccess={data => this.transactionSuccess(data)}
+                />
+              </div>
+            )}
           </div>
         )}
       </UserLayout>

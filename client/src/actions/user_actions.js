@@ -65,12 +65,9 @@ export function getCartItem(cartItems, userCart) {
   return { type: GET_CART_ITEM, payload: request };
 }
 
-// export function removeCartItem(id, qty) {
-//   const request = axios
-//     .get(`${USER_SERVER}/removefromcart?_id=${id}&qty=${qty}`)
-export function removeCartItem(id) {
+export function removeCartItem(id, quantity) {
   const request = axios
-    .get(`${USER_SERVER}/removefromcart?_id=${id}`)
+    .get(`${USER_SERVER}/removefromcart?_id=${id}&qty=${quantity}`)
     .then(res => {
       let dic = {};
       res.data.cart.forEach(item => {

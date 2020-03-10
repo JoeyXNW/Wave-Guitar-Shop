@@ -37,7 +37,7 @@ const ProductBlock = ({ products, removeItem }) => {
         <div className="item btn">
           <div
             className="cart_remove_btn"
-            onClick={() => removeItem(product._id)}
+            onClick={() => removeItem(product._id, product.quantity)}
           >
             Remove
           </div>

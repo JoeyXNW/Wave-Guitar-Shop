@@ -32,12 +32,20 @@ export default function(state = {}, action) {
       return {
         ...state,
         cartDetail: action.payload.cartDetail,
-        userData: { ...state.userData, cart: action.payload.cart }
+        userData: {
+          ...state.userData,
+          cart: action.payload.cart,
+          cartTotal: action.payload.cartTotal
+        }
       };
     case ADD_TO_CART:
       return {
         ...state,
-        userData: { ...state.userData, cart: action.payload }
+        userData: {
+          ...state.userData,
+          cart: action.payload.cart,
+          cartTotal: action.payload.cartTotal
+        }
       };
     default:
       return state;
