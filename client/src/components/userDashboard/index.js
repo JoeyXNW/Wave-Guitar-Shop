@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import UserLayout from "../../hoc/UserLayout";
 import Button from "../utils/Button";
 

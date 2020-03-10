@@ -63,7 +63,7 @@ class CollapseCheckBox extends Component {
   // switch case between title of prices and the rest
   renderList = () => {
     if (!this.props.list) return null;
-    if (this.props.title == "Prices") {
+    if (this.props.title === "Prices") {
       return this.props.list.map(item => (
         <FormControlLabel
           key={item._id}

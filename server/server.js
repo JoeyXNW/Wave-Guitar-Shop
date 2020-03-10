@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const formidable = require("express-formidable");
 const cloudinary = require("cloudinary");
+const async = require("async");
 
 const app = express();
 const mongoose = require("mongoose");
@@ -32,6 +33,7 @@ const { User } = require("./models/user");
 const { Brand } = require("./models/brand");
 const { Wood } = require("./models/wood");
 const { Guitar } = require("./models/guitar");
+const { Payment } = require("./models/payment");
 
 //Middleware
 const { auth } = require("./middleware/auth");
@@ -177,6 +179,7 @@ app.get("/api/users/auth", auth, (req, res) => {
     lastname: req.user.lastname,
     role: req.user.role,
     cart: req.user.cart,
+    cartTotal: req.user.cartTotal,
     history: req.user.history
   });
 });
@@ -245,12 +248,13 @@ app.post("/api/users/addtocart", auth, (req, res) => {
   User.findOne({ _id: req.user._id }, (err, doc) => {
     for (let item of doc.cart) {
       if (item.id == req.query.productId) {
-        return User.findOneAndUpdate(
+        return User.update(
           {
             _id: req.user._id,
             "cart.id": mongoose.Types.ObjectId(req.query.productId)
           },
-          { $inc: { "cart.$.quantity": 1 } },
+          // { $inc: { "cart.$.quantity": 1, cartTotal: 1 } },
+          { $inc: { "cart.$.quantity": 1, cartTotal: 1 } },
           { new: true },
           () => {
             if (err) return res.json({ success: false, err });
@@ -260,7 +264,8 @@ app.post("/api/users/addtocart", auth, (req, res) => {
       }
     }
 
-    User.findOneAndUpdate(
+    // User.findOneAndUpdate(
+    User.update(
       { _id: req.user._id },
       {
         $push: {
@@ -269,7 +274,8 @@ app.post("/api/users/addtocart", auth, (req, res) => {
             quantity: 1,
             date: Date.now()
           }
-        }
+        },
+        $inc: { cartTotal: 1 }
       },
       { new: true },
       (err, doc) => {
@@ -278,6 +284,99 @@ app.post("/api/users/addtocart", auth, (req, res) => {
       }
     );
   });
+});
+
+//Remove item from cart
+app.get("/api/users/removefromcart", auth, (req, res) => {
+  User.findOneAndUpdate(
+    { _id: req.user._id },
+    { $pull: { cart: { id: mongoose.Types.ObjectId(req.query._id) } } },
+    { new: true },
+    (err, doc) => {
+      console.log(doc);
+      let cart = doc.cart;
+      let array = cart.map(item => {
+        return mongoose.Types.ObjectId(item.id);
+      });
+
+      Guitar.find({ _id: { $in: array } })
+        .populate("brand")
+        .populate("wood")
+        .exec((err, cartDetail) => {
+          return res.status(200).json({
+            cartDetail,
+            cart
+          });
+        });
+    }
+  );
+});
+
+//Order success
+app.post("/api/users/ordersuccess", auth, (req, res) => {
+  //user history
+  let history = [];
+  let transactionData = {};
+
+  req.body.cartDetail.forEach(item =>
+    history.push({
+      dateOfPurchase: Date.now(),
+      name: item.name,
+      breand: item.brand,
+      id: item._id,
+      price: item.price,
+      quantity: item.quantity,
+      paymentId: req.body.paymentData.paymentId
+    })
+  );
+  //payment dash
+  transactionData.user = {
+    id: req.user._id,
+    name: req.user.name,
+    lastname: req.user.lastname,
+    email: req.user.email
+  };
+  transactionData.data = req.body.paymentData;
+  transactionData.product = history;
+  //update user info
+  User.findOneAndUpdate(
+    { _id: req.user._id },
+    { $push: { history: history }, $set: { cart: [], cartTotal: 0 } },
+    { new: true },
+    (err, user) => {
+      if (err) return res.json({ success: false, err });
+
+      const payment = new Payment(transactionData);
+      payment.save((err, doc) => {
+        if (err) return res.json({ success: false, err });
+
+        let products = [];
+        doc.product.forEach(item => {
+          products.push({ id: item.id, quantity: item.quantity });
+        });
+
+        async.eachSeries(
+          products,
+          (item, callback) => {
+            Guitar.update(
+              { _id: item.id },
+              { $inc: { sold: item.quantity } },
+              { new: false },
+              callback
+            );
+          },
+          err => {
+            if (err) return res.json({ success: false, err });
+            res.status(200).json({
+              success: true,
+              cart: user.cart,
+              cartDetail: []
+            });
+          }
+        );
+      });
+    }
+  );
 });
 
 //===========================================

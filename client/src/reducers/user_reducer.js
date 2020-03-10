@@ -3,7 +3,10 @@ import {
   REGISTER_USER,
   AUTH_USER,
   LOGOUT_USER,
-  ADD_TO_CART
+  ADD_TO_CART,
+  GET_CART_ITEM,
+  REMOVE_CART_ITEM,
+  ORDER_SUCCESS
 } from "../actions/types";
 
 export default function(state = {}, action) {
@@ -16,13 +19,25 @@ export default function(state = {}, action) {
       return { ...state, userData: action.payload };
     case LOGOUT_USER:
       return { ...state, logoutSuccess: action.payload };
+    case GET_CART_ITEM:
+      return { ...state, cartDetail: action.payload };
+    case ORDER_SUCCESS:
+      return {
+        ...state,
+        success: action.payload.success,
+        userData: { ...state.userData, cart: action.payload.cart },
+        cartDetail: action.payload.cartDetail
+      };
+    case REMOVE_CART_ITEM:
+      return {
+        ...state,
+        cartDetail: action.payload.cartDetail,
+        userData: { ...state.userData, cart: action.payload.cart }
+      };
     case ADD_TO_CART:
       return {
         ...state,
-        userData: {
-          ...state.userData,
-          cart: action.payload
-        } //add cart to user
+        userData: { ...state.userData, cart: action.payload }
       };
     default:
       return state;

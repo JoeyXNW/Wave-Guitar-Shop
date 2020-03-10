@@ -30,6 +30,10 @@ const userSchema = mongoose.Schema({
     type: Array,
     default: []
   },
+  cartTotal: {
+    type: Number,
+    default: 0
+  },
   history: {
     type: Array,
     default: []

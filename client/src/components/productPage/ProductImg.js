@@ -34,7 +34,7 @@ class ProductImg extends Component {
 
   showThumbs = () =>
     this.state.lightboxImg.map((image, i) => {
-      if (i === 0) return;
+      if (i === 0) return null;
       return (
         <div
           key={i}

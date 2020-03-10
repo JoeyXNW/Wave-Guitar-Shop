@@ -4,10 +4,13 @@ import {
   REGISTER_USER,
   AUTH_USER,
   LOGOUT_USER,
-  ADD_TO_CART
+  ADD_TO_CART,
+  GET_CART_ITEM,
+  REMOVE_CART_ITEM,
+  ORDER_SUCCESS
 } from "./types";
 
-import { USER_SERVER } from "../components/utils/misc";
+import { USER_SERVER, PRODUCT_SERVER } from "../components/utils/misc";
 
 export function loginUser(dataToSubmit) {
   const request = axios
@@ -43,4 +46,48 @@ export function addToCart(_id) {
     .then(res => res.data);
 
   return { type: ADD_TO_CART, payload: request };
+}
+
+export function getCartItem(cartItems, userCart) {
+  // turn userCart to a dictionary to save time
+  let dic = {};
+  userCart.forEach(item => {
+    dic[item.id] = item.quantity;
+  });
+
+  const request = axios
+    .get(`${PRODUCT_SERVER}/guitars_by_id?id=${cartItems}&type=array`)
+    .then(res => {
+      res.data.forEach(item => (item.quantity = dic[item._id]));
+      return res.data;
+    });
+
+  return { type: GET_CART_ITEM, payload: request };
+}
+
+// export function removeCartItem(id, qty) {
+//   const request = axios
+//     .get(`${USER_SERVER}/removefromcart?_id=${id}&qty=${qty}`)
+export function removeCartItem(id) {
+  const request = axios
+    .get(`${USER_SERVER}/removefromcart?_id=${id}`)
+    .then(res => {
+      let dic = {};
+      res.data.cart.forEach(item => {
+        dic[item.id] = item.quantity;
+      });
+
+      res.data.cartDetail.forEach(item => (item.quantity = dic[item._id]));
+      return res.data;
+    });
+
+  return { type: REMOVE_CART_ITEM, payload: request };
+}
+
+export function orderSuccess(data) {
+  const request = axios
+    .post(`${USER_SERVER}/ordersuccess`, data)
+    .then(res => res.data);
+
+  return { type: ORDER_SUCCESS, payload: request };
 }

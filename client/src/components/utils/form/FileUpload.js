@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { CircularProgress } from "@material-ui/core";
 import { postImage, removeImage } from "../../../actions/cloudinary";
-import axios from "axios";
 
 class FileUpload extends Component {
   state = {

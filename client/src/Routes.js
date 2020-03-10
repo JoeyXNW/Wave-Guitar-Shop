@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { Route, Switch } from "react-router-dom";
 
 import Home from "./components/home";
@@ -11,6 +11,7 @@ import AddProducts from "./components/userDashboard/Admin/AddProducts";
 import ManageCategories from "./components/userDashboard/Admin/ManageCategories";
 import Auth from "./hoc/Auth";
 import Layout from "./hoc/Layout";
+import UserCart from "./components/userDashboard/UserCart";
 
 const Routes = () => {
   return (
@@ -30,6 +31,7 @@ const Routes = () => {
           path="/user/dashboard"
           component={Auth(UserDashboard, true)}
         />
+        <Route exact path="/user/cart" component={Auth(UserCart, true)} />
         <Route
           exact
           path="/admin/add_product"
