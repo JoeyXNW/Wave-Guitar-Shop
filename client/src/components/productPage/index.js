@@ -51,6 +51,7 @@ class ProductPage extends Component {
               <div className="right">
                 <ProductInfo
                   detail={this.props.guitar}
+                  user={this.props.user}
                   addToCart={id => this.addToCart(id)}
                 />
               </div>
@@ -63,7 +64,7 @@ class ProductPage extends Component {
 }
 
 const mapStateToProps = state => {
-  return { guitar: state.products.guitar };
+  return { guitar: state.products.guitar, user: state.user.userData };
 };
 
 export default connect(mapStateToProps)(ProductPage);

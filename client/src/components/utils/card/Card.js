@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Button from "../Button";
 import { connect } from "react-redux";
 import { addToCart } from "../../../actions/user_actions";
+import { withRouter } from "react-router-dom";
 
 class Card extends Component {
   state = {};
@@ -40,7 +41,7 @@ class Card extends Component {
                 runAction={() => {
                   props.user.userData.isAuth
                     ? this.props.dispatch(addToCart(props._id))
-                    : console.log("log in first please");
+                    : this.props.history.push("/register_login");
                 }}
               />
             </div>
@@ -55,4 +56,4 @@ const mapStateToProps = state => {
   return { user: state.user };
 };
 
-export default connect(mapStateToProps)(Card);
+export default connect(mapStateToProps)(withRouter(Card));

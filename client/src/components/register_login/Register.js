@@ -108,7 +108,7 @@ class Register extends Component {
         this.setState({ formSuccess: true });
         setTimeout(() => {
           this.setState({ formSuccess: false });
-          this.props.history.push("/register_login");
+          // this.props.history.push("/register_login");
         }, 2000);
       } else {
         this.setState({ formError: true });

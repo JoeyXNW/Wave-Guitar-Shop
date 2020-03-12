@@ -1,9 +1,10 @@
 import React from "react";
 import UserLayout from "../../hoc/UserLayout";
 import Button from "../utils/Button";
+import HistoryBlock from "../utils/user/HistoryBlock";
 
 const UserDashboard = ({ user }) => {
-  const { name, lastname, email } = user.userData;
+  const { name, lastname, email, history } = user.userData;
   return (
     <UserLayout>
       <>
@@ -20,10 +21,14 @@ const UserDashboard = ({ user }) => {
             title="Edit Information"
           />
         </div>
-        <div className="user_nfo_panel">
-          <h1>Purchase History</h1>
-          <div className="user_product_block_wrapper">History</div>
-        </div>
+        {history && (
+          <div className="user_nfo_panel">
+            <h1>Purchase History</h1>
+            <div className="user_product_block_wrapper">
+              <HistoryBlock history={history} />
+            </div>
+          </div>
+        )}
       </>
     </UserLayout>
   );

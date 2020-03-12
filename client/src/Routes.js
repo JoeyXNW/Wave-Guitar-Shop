@@ -12,6 +12,8 @@ import ManageCategories from "./components/userDashboard/Admin/ManageCategories"
 import Auth from "./hoc/Auth";
 import Layout from "./hoc/Layout";
 import UserCart from "./components/userDashboard/UserCart";
+import UpdateProfile from "./components/userDashboard/UpdateProfile";
+import ManageSite from "./components/userDashboard/Admin/ManageSite";
 
 const Routes = () => {
   return (
@@ -31,6 +33,11 @@ const Routes = () => {
           path="/user/dashboard"
           component={Auth(UserDashboard, true)}
         />
+        <Route
+          exact
+          path="/user/user_profile"
+          component={Auth(UpdateProfile, true)}
+        />
         <Route exact path="/user/cart" component={Auth(UserCart, true)} />
         <Route
           exact
@@ -41,6 +48,11 @@ const Routes = () => {
           exact
           path="/admin/manage_categories"
           component={Auth(ManageCategories, true, true)}
+        />
+        <Route
+          exact
+          path="/admin/site_info"
+          component={Auth(ManageSite, true, true)}
         />
       </Switch>
     </Layout>

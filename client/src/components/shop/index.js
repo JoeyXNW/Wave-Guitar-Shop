@@ -11,9 +11,11 @@ import {
 } from "../../actions/product_actions";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faTh } from "@fortawesome/free-solid-svg-icons";
+import { CircularProgress } from "@material-ui/core";
 
 class Shop extends Component {
   state = {
+    isLoading: true,
     grid: false,
     limit: 6,
     skip: 0,
@@ -28,9 +30,11 @@ class Shop extends Component {
   componentDidMount() {
     this.props.dispatch(getBrands());
     this.props.dispatch(getWoods());
-    this.props.dispatch(
-      getProductsToShop(this.state.skip, this.state.limit, this.state.filters)
-    );
+    this.props
+      .dispatch(
+        getProductsToShop(this.state.skip, this.state.limit, this.state.filters)
+      )
+      .then(this.setState({ isLoading: false }));
   }
 
   handleFilters = (filters, category) => {
@@ -104,31 +108,35 @@ class Shop extends Component {
                 handleFilters={filters => this.handleFilters(filters, "price")}
               />
             </div>
-            <div className="right">
-              <div className="shop_options">
-                <div className="shop_grids clear">
-                  <div
-                    className={`grid_btn ${!this.state.grid ? "" : "active"}`}
-                    onClick={this.handleGrids}
-                  >
-                    <FontAwesomeIcon icon={faBars} />
-                  </div>
-                  <div
-                    className={`grid_btn ${this.state.grid ? "" : "active"}`}
-                    onClick={this.handleGrids}
-                  >
-                    <FontAwesomeIcon icon={faTh} />
+            {this.state.isLoading ? (
+              <CircularProgress style={{ color: "#00bcd4" }} thickness={7} />
+            ) : (
+              <div className="right">
+                <div className="shop_options">
+                  <div className="shop_grids clear">
+                    <div
+                      className={`grid_btn ${!this.state.grid ? "" : "active"}`}
+                      onClick={this.handleGrids}
+                    >
+                      <FontAwesomeIcon icon={faBars} />
+                    </div>
+                    <div
+                      className={`grid_btn ${this.state.grid ? "" : "active"}`}
+                      onClick={this.handleGrids}
+                    >
+                      <FontAwesomeIcon icon={faTh} />
+                    </div>
                   </div>
                 </div>
+                <LoadMoreCards
+                  grid={this.state.grid}
+                  limit={this.state.limit}
+                  list={products.toShop}
+                  size={products.toShopSize}
+                  loadMore={this.loadMore}
+                />
               </div>
-              <LoadMoreCards
-                grid={this.state.grid}
-                limit={this.state.limit}
-                list={products.toShop}
-                size={products.toShopSize}
-                loadMore={this.loadMore}
-              />
-            </div>
+            )}
           </div>
         </div>
       </>

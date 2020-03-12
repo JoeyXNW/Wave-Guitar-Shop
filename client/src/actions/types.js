@@ -16,3 +16,9 @@ export const ADD_TO_CART = "add_to_cart";
 export const GET_CART_ITEM = "get_cart_item";
 export const REMOVE_CART_ITEM = "remove_cart_item";
 export const ORDER_SUCCESS = "order_success";
+export const UPDATE_USER = "update_user";
+export const CLEAR_USER_INFO = "clear_user_info";
+
+//site
+export const GET_SITE_INFO = "get_site_info";
+export const UPDATE_SITE_INFO = "update_site_info";

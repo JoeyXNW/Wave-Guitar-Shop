@@ -2,6 +2,7 @@ import React from "react";
 import Button from "../utils/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTruck, faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { withRouter } from "react-router-dom";
 
 const ProductInfo = props => {
   const { detail } = props;
@@ -38,14 +39,16 @@ const ProductInfo = props => {
     </div>
   );
 
+  const addCart = () => {
+    if (props.user.isAuth) return this.props.addToCart();
+    return props.history.push("/register_login");
+  };
+
   const showProdActions = detail => (
     <div className="product_actions">
       <div className="price">$ {detail.price}</div>
       <div className="cart">
-        <Button
-          type="add_to_cart_link"
-          runAction={() => props.addToCart(detail._id)}
-        />
+        <Button type="add_to_cart_link" runAction={addCart} />
       </div>
     </div>
   );
@@ -79,4 +82,4 @@ const ProductInfo = props => {
   );
 };
 
-export default ProductInfo;
+export default withRouter(ProductInfo);

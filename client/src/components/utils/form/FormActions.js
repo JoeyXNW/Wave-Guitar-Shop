@@ -59,3 +59,13 @@ export const populateOptionFields = (formData, arrayData = [], field) => {
   formData[field].config.options = newArray;
   return formData;
 };
+
+export const populateFields = (formData, fields) => {
+  for (let key in formData) {
+    formData[key].value = fields[key];
+    formData[key].valid = true;
+    formData[key].touched = true;
+    formData[key].validationMessage = "";
+  }
+  return formData;
+};

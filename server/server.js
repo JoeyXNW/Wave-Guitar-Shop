@@ -34,6 +34,7 @@ const { Brand } = require("./models/brand");
 const { Wood } = require("./models/wood");
 const { Guitar } = require("./models/guitar");
 const { Payment } = require("./models/payment");
+const { Site } = require("./models/site");
 
 //Middleware
 const { auth } = require("./middleware/auth");
@@ -391,6 +392,20 @@ app.post("/api/users/ordersuccess", auth, (req, res) => {
   );
 });
 
+//update user
+app.post("/api/users/update_profile", auth, (req, res) => {
+  User.findOneAndUpdate(
+    { _id: req.user._id },
+    { $set: req.body },
+    { new: true },
+    (err, doc) => {
+      if (err) return res.json({ success: false, err });
+
+      res.status(200).json({ success: true }); //userData: doc
+    }
+  );
+});
+
 //===========================================
 //             Cloudindary
 //===========================================
@@ -403,4 +418,47 @@ app.get("/api/users/removeimage", auth, admin, (req, res) => {
 
     res.status(200).send("image removed successfully");
   });
+});
+
+//===========================================
+//             Site
+//===========================================
+
+//get site data
+app.get("/api/site/site_data", (req, res) => {
+  Site.find({}, (err, site) => {
+    if (err) return res.json({ success: false });
+    res.status(200).send(site[0].siteInfo);
+  });
+});
+
+//update site data
+// app.post("/api/site/site_data", auth, admin, (req, res) => {
+//   Site.findOneAndUpdate(
+//     { name: "Site" },
+//     { $set: { siteInfo: req.body } },
+//     { new: true },
+//     (err, doc) => {
+//       if (err) return res.json({ success: false });
+//       res.status(200).send({
+//         success: true,
+//         siteInfo: doc.siteInfo
+//       });
+//     }
+//   );
+// });
+
+app.post("/api/site/site_data", auth, admin, (req, res) => {
+  Site.findOneAndUpdate(
+    { name: "Site" },
+    { $set: { siteInfo: req.body } },
+    { new: true },
+    (err, doc) => {
+      if (err) return res.json({ success: false, err });
+      return res.status(200).send({
+        success: true,
+        siteInfo: doc.siteInfo
+      });
+    }
+  );
 });

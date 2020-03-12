@@ -7,7 +7,9 @@ import {
   ADD_TO_CART,
   GET_CART_ITEM,
   REMOVE_CART_ITEM,
-  ORDER_SUCCESS
+  ORDER_SUCCESS,
+  UPDATE_USER,
+  CLEAR_USER_INFO
 } from "./types";
 
 import { USER_SERVER, PRODUCT_SERVER } from "../components/utils/misc";
@@ -87,4 +89,16 @@ export function orderSuccess(data) {
     .then(res => res.data);
 
   return { type: ORDER_SUCCESS, payload: request };
+}
+
+export function updateUser(data) {
+  const request = axios
+    .post(`${USER_SERVER}/update_profile`, data)
+    .then(res => res.data);
+
+  return { type: UPDATE_USER, payload: request };
+}
+
+export function clearUserInfo() {
+  return { type: CLEAR_USER_INFO, payload: "" };
 }
