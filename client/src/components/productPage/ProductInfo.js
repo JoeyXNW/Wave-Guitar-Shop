@@ -40,7 +40,8 @@ const ProductInfo = props => {
   );
 
   const addCart = () => {
-    if (props.user.isAuth) return this.props.addToCart();
+    // console.log(props);
+    if (props.user.isAuth) return props.addToCart(props.match.params.id);
     return props.history.push("/register_login");
   };
 

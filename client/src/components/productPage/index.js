@@ -52,7 +52,7 @@ class ProductPage extends Component {
                 <ProductInfo
                   detail={this.props.guitar}
                   user={this.props.user}
-                  addToCart={id => this.addToCart(id)}
+                  addToCart={this.addToCart}
                 />
               </div>
             </div>
