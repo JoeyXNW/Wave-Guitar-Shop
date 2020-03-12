@@ -11,7 +11,7 @@ import ReduxThunk from "redux-thunk";
 import Reducer from "./reducers";
 import Routes from "./Routes";
 
-// Apply middleware
+// Apply middleware to the app
 const createStoreWithMiddleware = applyMiddleware(
   promiseMiddleware,
   ReduxThunk
