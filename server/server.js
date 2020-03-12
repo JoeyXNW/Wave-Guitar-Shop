@@ -10,11 +10,14 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 
 mongoose.Promise = global.Promise;
-mongoose.connect(process.env.DATABASE);
+// mongoose.connect(process.env.DATABASE);
+mongoose.connect(process.env.MONGODB_URI);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+app.use(express.static("client/build"));
 
 const port = process.env.PORT || 3002;
 app.listen(port, () => {
@@ -432,22 +435,6 @@ app.get("/api/site/site_data", (req, res) => {
   });
 });
 
-//update site data
-// app.post("/api/site/site_data", auth, admin, (req, res) => {
-//   Site.findOneAndUpdate(
-//     { name: "Site" },
-//     { $set: { siteInfo: req.body } },
-//     { new: true },
-//     (err, doc) => {
-//       if (err) return res.json({ success: false });
-//       res.status(200).send({
-//         success: true,
-//         siteInfo: doc.siteInfo
-//       });
-//     }
-//   );
-// });
-
 app.post("/api/site/site_data", auth, admin, (req, res) => {
   Site.findOneAndUpdate(
     { name: "Site" },
@@ -462,3 +449,14 @@ app.post("/api/site/site_data", auth, admin, (req, res) => {
     }
   );
 });
+
+//===========================================
+//             Default
+//===========================================
+// only for production
+if (process.env.NODE_ENV === "production") {
+  const path = require("path");
+  app.get("/*", (req, res) => {
+    res.sendfile(path.resolve(__dirname, "../client", "index.html"));
+  });
+}
