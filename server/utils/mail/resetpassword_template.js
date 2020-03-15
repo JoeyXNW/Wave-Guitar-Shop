@@ -5,7 +5,6 @@ const resetPassword = data => {
     process.env.NODE_ENV === "production"
       ? process.env.ROOT_URL
       : "http://localhost:3000";
-  console.log(URL);
   return `<!DOCTYPE html>
     <html style="margin: 0; padding: 0;">
     
