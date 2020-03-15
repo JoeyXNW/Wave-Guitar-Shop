@@ -14,6 +14,9 @@ import Layout from "./hoc/Layout";
 import UserCart from "./components/userDashboard/UserCart";
 import UpdateProfile from "./components/userDashboard/UpdateProfile";
 import ManageSite from "./components/userDashboard/Admin/ManageSite";
+import ResetUser from "./components/resetUser";
+import PageNotFound from "./components/utils/PageNotFound";
+import ResetPassword from "./components/resetUser/ResetPassword";
 
 const Routes = () => {
   return (
@@ -22,12 +25,19 @@ const Routes = () => {
         <Route exact path="/" component={Auth(Home)} />
         <Route exact path="/product_detail/:id" component={Auth(ProductPage)} />
         <Route exact path="/shop" component={Auth(Shop)} />
+
         <Route
           exact
           path="/register_login"
           component={Auth(RegisterLogin, false)}
         />
         <Route exact path="/register" component={Auth(Register, false)} />
+        <Route exact path="/reset_user" component={Auth(ResetUser, false)} />
+        <Route
+          exact
+          path="/reset_password/:token"
+          component={Auth(ResetPassword, false)}
+        />
         <Route
           exact
           path="/user/dashboard"
@@ -54,6 +64,7 @@ const Routes = () => {
           path="/admin/site_info"
           component={Auth(ManageSite, true, true)}
         />
+        <Route component={Auth(PageNotFound)} />
       </Switch>
     </Layout>
   );

@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const SALT_I = 10;
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const moment = require("moment");
 require("dotenv").config();
 
 const userSchema = mongoose.Schema({
@@ -44,6 +46,13 @@ const userSchema = mongoose.Schema({
   },
   token: {
     type: String
+  },
+  // to reset user
+  resetToken: {
+    type: String
+  },
+  resetTokenExp: {
+    type: Number
   }
 });
 
@@ -76,6 +85,29 @@ userSchema.methods.generateToken = function(cb) {
   user.save(function(err, user) {
     if (err) return cb(err);
     return cb(null, user);
+  });
+};
+
+userSchema.methods.generateResetToken = function(cb) {
+  var user = this;
+  crypto.randomBytes(20, function(err, buffer) {
+    var token = buffer.toString("hex");
+
+    // set up expiry date
+    var today = moment()
+      .startOf("day")
+      .valueOf();
+    var tomorrow = moment(today)
+      .endOf("day")
+      .valueOf();
+
+    user.resetToken = token;
+    user.resetTokenExp = tomorrow;
+
+    user.save(function(err, user) {
+      if (err) return cb(err);
+      return cb(null, user);
+    });
   });
 };
 

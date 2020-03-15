@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const formidable = require("express-formidable");
 const cloudinary = require("cloudinary");
 const async = require("async");
+const moment = require("moment");
 
 const app = express();
 const mongoose = require("mongoose");
@@ -40,6 +41,10 @@ const { auth } = require("./middleware/auth");
 const { admin } = require("./middleware/admin");
 
 mongoose.set("useFindAndModify", false);
+
+//Utils
+const { sendEmail } = require("./utils/mail/index");
+
 //===========================================
 //              Guitar
 //===========================================
@@ -84,7 +89,7 @@ app.post("/api/product/guitar", auth, admin, (req, res) => {
   const guitar = new Guitar(req.body);
   guitar.save((err, doc) => {
     if (err) return res.json({ success: false, err });
-    res.status(200).json({
+    return res.status(200).json({
       success: true
       // guitar: doc
     });
@@ -191,7 +196,8 @@ app.post("/api/users/register", (req, res) => {
   const user = new User(req.body);
   user.save((err, doc) => {
     if (err) return res.json({ success: false, err });
-    res.status(200).json({
+    sendEmail(doc.email, doc.name, null, "welcome");
+    return res.status(200).json({
       registerSuccess: true
       // userdata: doc
     });
@@ -401,6 +407,49 @@ app.post("/api/users/update_profile", auth, (req, res) => {
       if (err) return res.json({ success: false, err });
 
       res.status(200).json({ success: true }); //userData: doc
+    }
+  );
+});
+
+//reset user
+app.post("/api/users/reset_user", (req, res) => {
+  User.findOne({ email: req.body.email }, (err, user) => {
+    if (user == null) return res.json({ success: false });
+
+    user.generateResetToken((err, user) => {
+      if (err) return res.json({ success: false });
+
+      sendEmail(user.email, user.name, null, "reset_password", user);
+      res.json({ success: true });
+    });
+  });
+});
+
+//reset password
+app.post("/api/users/reset_password", (req, res) => {
+  var today = moment()
+    .startOf("day")
+    .valueOf();
+
+  User.findOne(
+    { resetToken: req.body.resetToken, resetTokenExp: { $gte: today } },
+    (err, user) => {
+      console.log(user);
+      if (!user)
+        return res.json({
+          success: false
+        });
+
+      user.password = req.body.password;
+      user.resetToken = "";
+      user.resetTokenExp = "";
+      user.save((err, doc) => {
+        if (err) return res.status(400).json({ success: false, err });
+
+        return res.status(200).json({
+          success: true
+        });
+      });
     }
   );
 });

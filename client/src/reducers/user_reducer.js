@@ -8,7 +8,9 @@ import {
   REMOVE_CART_ITEM,
   ORDER_SUCCESS,
   UPDATE_USER,
-  CLEAR_USER_INFO
+  CLEAR_USER_INFO,
+  RESET_PASSWORD,
+  RESET_USER
 } from "../actions/types";
 
 export default function(state = {}, action) {
@@ -57,6 +59,10 @@ export default function(state = {}, action) {
       };
     case CLEAR_USER_INFO:
       return { ...state, updateUserSuccess: action.payload };
+    case RESET_PASSWORD:
+      return { ...state, resetPasswordSuccess: action.payload };
+    case RESET_USER:
+      return { ...state, resetSuccess: action.payload };
     default:
       return state;
   }

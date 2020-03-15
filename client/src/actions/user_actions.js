@@ -9,7 +9,8 @@ import {
   REMOVE_CART_ITEM,
   ORDER_SUCCESS,
   UPDATE_USER,
-  CLEAR_USER_INFO
+  CLEAR_USER_INFO,
+  RESET_PASSWORD
 } from "./types";
 
 import { USER_SERVER, PRODUCT_SERVER } from "../components/utils/misc";
@@ -101,4 +102,20 @@ export function updateUser(data) {
 
 export function clearUserInfo() {
   return { type: CLEAR_USER_INFO, payload: "" };
+}
+
+export function resetPassword(data) {
+  const request = axios
+    .post(`${USER_SERVER}/reset_password`, data)
+    .then(res => res.data);
+
+  return { type: RESET_PASSWORD, payload: request };
+}
+
+export function resetUser(data) {
+  const request = axios
+    .post(`${USER_SERVER}/reset_user`, data)
+    .then(res => res.data);
+
+  return { type: RESET_PASSWORD, payload: request };
 }
