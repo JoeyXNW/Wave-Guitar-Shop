@@ -50,10 +50,10 @@ const ProductInfo = props => {
       <div className="cart">
         <Button type="add_to_cart_link" runAction={addCart} />
         {/* ******************* DELETE  *************************/}
-        <Button
+        {/* <Button
           linkTo={`/admin/modify_product/${props.match.params.id}`}
           title="modify info"
-        />
+        /> */}
       </div>
     </div>
   );
