@@ -56,6 +56,11 @@ const Routes = () => {
         />
         <Route
           exact
+          path="/admin/modify_product/:id"
+          component={Auth(AddProducts, true, true)}
+        />
+        <Route
+          exact
           path="/admin/manage_categories"
           component={Auth(ManageCategories, true, true)}
         />

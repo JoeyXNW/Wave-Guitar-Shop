@@ -40,7 +40,6 @@ const ProductInfo = props => {
   );
 
   const addCart = () => {
-    // console.log(props);
     if (props.user.isAuth) return props.addToCart(props.match.params.id);
     return props.history.push("/register_login");
   };
@@ -50,6 +49,11 @@ const ProductInfo = props => {
       <div className="price">$ {detail.price}</div>
       <div className="cart">
         <Button type="add_to_cart_link" runAction={addCart} />
+        {/* ******************* DELETE  *************************/}
+        {/* <Button
+          linkTo={`/admin/modify_product/${props.match.params.id}`}
+          title="modify info"
+        /> */}
       </div>
     </div>
   );

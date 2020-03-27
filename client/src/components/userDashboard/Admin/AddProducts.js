@@ -4,7 +4,9 @@ import { connect } from "react-redux";
 import {
   addProduct,
   getBrands,
-  getWoods
+  getWoods,
+  getGuitarById,
+  updateProduct
 } from "../../../actions/product_actions";
 import UserLayout from "../../../hoc/UserLayout";
 import FileUpload from "../../utils/form/FileUpload";
@@ -17,6 +19,8 @@ import {
 import FormField from "../../utils/form/FormField";
 
 const initialState = {
+  guitarId: "",
+  pageTitle: "",
   formError: false,
   formSuccess: false,
   formErrorMessage: "Please check your inputs",
@@ -199,15 +203,55 @@ class AddProducts extends Component {
   state = initialState;
 
   componentDidMount() {
-    const formData = this.state.formData;
-    this.props.dispatch(getBrands()).then(_ => {
-      populateOptionFields(formData, this.props.products.brands, "brand");
+    const id = this.props.match.params.id;
+    this.setState({
+      pageTitle: id ? "modify product" : "add product",
+      guitarId: id
     });
-    this.props.dispatch(getWoods()).then(_ => {
-      populateOptionFields(formData, this.props.products.woods, "wood");
+
+    this.props.dispatch(getBrands()).then(_ => {
+      const formData = populateOptionFields(
+        this.state.formData,
+        this.props.products.brands,
+        "brand"
+      );
       this.setState({ formData });
     });
+    this.props.dispatch(getWoods()).then(_ => {
+      const formData = populateOptionFields(
+        this.state.formData,
+        this.props.products.woods,
+        "wood"
+      );
+      this.setState({ formData });
+    });
+
+    if (id) {
+      this.props
+        .dispatch(getGuitarById(id))
+        .then(_ =>
+          this.populateValueFields(
+            this.state.formData,
+            this.props.products.guitar
+          )
+        );
+    }
   }
+
+  populateValueFields = (formData, arrayData) => {
+    const newFormData = { ...formData };
+    for (let key in newFormData) {
+      const newElement = { ...newFormData[key] };
+      if (key === "brand" || key === "wood") {
+        newElement.value = arrayData[key]._id;
+      } else {
+        newElement.value = arrayData[key];
+      }
+      newElement.valid = true;
+      newFormData[key] = newElement;
+    }
+    this.setState({ formData: newFormData });
+  };
 
   submitForm = event => {
     event.preventDefault();
@@ -220,13 +264,18 @@ class AddProducts extends Component {
       return this.setState({ formError: true });
     }
 
-    this.props.dispatch(addProduct(dataToSubmit)).then(response => {
+    let action = "";
+    if (this.state.guitarId) {
+      action = this.props.dispatch(updateProduct(dataToSubmit));
+    } else {
+      action = this.props.dispatch(addProduct(dataToSubmit));
+    }
+    action.then(response => {
       if (response.payload.success) {
         this.setState(initialState);
         this.setState({ formSuccess: true });
         setTimeout(() => {
           this.setState({ formSuccess: false });
-          //   this.props.history.push("/admin/site_info");
         }, 2000);
       } else {
         this.setState({ formError: true });
@@ -237,6 +286,7 @@ class AddProducts extends Component {
   updateForm = element => {
     const newFormData = update(element, this.state.formData, "products");
     this.setState({ formError: false, formData: newFormData });
+    console.log(this.state.formData);
   };
 
   imageHandler = images => {
@@ -250,7 +300,9 @@ class AddProducts extends Component {
     return (
       <UserLayout>
         <>
-          <h1 style={{ textTransform: "capitalize" }}>Add Product</h1>
+          <h1 style={{ textTransform: "capitalize" }}>
+            {this.state.pageTitle}
+          </h1>
           <form onSubmit={event => this.submitForm(event)}>
             <FileUpload
               imageHandler={images => this.imageHandler(images)}
@@ -312,7 +364,7 @@ class AddProducts extends Component {
             {this.state.formError && (
               <div className="error_label">Please check your data</div>
             )}
-            <button type="submit">Add a product</button>
+            <button type="submit">{this.state.pageTitle}</button>
           </form>
         </>
       </UserLayout>

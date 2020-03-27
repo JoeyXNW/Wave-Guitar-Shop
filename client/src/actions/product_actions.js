@@ -9,7 +9,8 @@ import {
   ADD_BRAND,
   ADD_WOOD,
   GET_GUITAR_BY_ID,
-  CLEAR_PRODUCT_DETAIL
+  CLEAR_PRODUCT_DETAIL,
+  UPDATE_PRODUCT
 } from "./types";
 import { PRODUCT_SERVER } from "../components/utils/misc";
 
@@ -99,4 +100,12 @@ export function getGuitarById(id) {
 
 export function clearProductDetail() {
   return { type: CLEAR_PRODUCT_DETAIL, payload: "" };
+}
+
+export function updateProduct(dataToSubmit) {
+  const request = axios
+    .post(`${PRODUCT_SERVER}/update_product`, dataToSubmit)
+    .then(res => res.data);
+
+  return { type: UPDATE_PRODUCT, payload: request };
 }

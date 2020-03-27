@@ -23,6 +23,7 @@ export const CLEAR_PRODUCT_DETAIL = "clear_product_detail";
 export const ADD_TO_CART = "add_to_cart";
 export const GET_CART_ITEM = "get_cart_item";
 export const REMOVE_CART_ITEM = "remove_cart_item";
+export const UPDATE_PRODUCT = "update_product";
 
 //site
 export const GET_SITE_INFO = "get_site_info";

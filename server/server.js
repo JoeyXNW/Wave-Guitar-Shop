@@ -129,6 +129,20 @@ app.get("/api/product/guitars_by_id", (req, res) => {
     .populate("wood")
     .exec((err, doc) => res.status(200).send(doc));
 });
+
+//update guitar
+app.post("/api/product/update_product", auth, (req, res) => {
+  Guitar.findOneAndUpdate(
+    { name: req.body.name },
+    { $set: req.body },
+    { new: true },
+    (err, doc) => {
+      if (err) return res.json({ success: false, err });
+
+      res.status(200).json({ success: true }); //userData: doc
+    }
+  );
+});
 //===========================================
 //              Woods
 //===========================================

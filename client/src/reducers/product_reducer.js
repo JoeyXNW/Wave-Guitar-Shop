@@ -8,7 +8,8 @@ import {
   GET_PRODUCTS_TO_SHOP,
   GET_WOODS,
   GET_GUITAR_BY_ID,
-  CLEAR_PRODUCT_DETAIL
+  CLEAR_PRODUCT_DETAIL,
+  UPDATE_PRODUCT
 } from "../actions/types";
 
 export default function(state = {}, action) {
@@ -45,6 +46,8 @@ export default function(state = {}, action) {
       };
     case CLEAR_PRODUCT_DETAIL:
       return { ...state, guitar: action.payload };
+    case UPDATE_PRODUCT:
+      return { ...state, updateSuccess: action.payload };
     default:
       return state;
   }
